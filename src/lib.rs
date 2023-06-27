@@ -8,14 +8,19 @@ use syn::{parse_macro_input, Expr, Field, ItemStruct, Meta, MetaList};
 
 /// Auto implement `From` trait.
 ///
-/// Both structs are expected to have the same fields.
+/// When specifying conversion, all fields in the receiving struct type
+/// must either be defined in the sender, or have their default values
+/// defined on the receiver.
+///
+/// Default value attribute lets you override data from sender.
 ///
 /// <br>
 ///
-/// # Example
-/// ```ignore
+/// # Examples
+/// ```
 /// use struct_auto_from::auto_from;
 ///
+/// #[derive(Clone)]
 /// struct Model1 {
 ///     id: i32,
 ///     name: String,
@@ -29,11 +34,56 @@ use syn::{parse_macro_input, Expr, Field, ItemStruct, Meta, MetaList};
 ///     attrs: Vec<String>,
 /// }
 ///
-/// ...
 ///
-/// let m1: Model1 = /* ... */;
-/// let m2: Model2 = m1.into();
+/// let m1: Model1 = Model1 {
+///     id: 0,
+///     name: "M".into(),
+///     attrs: vec![],
+/// };
+/// let m2: Model2 = m1.clone().into();
+///
+/// assert_eq!(m1.id, m2.id);
+/// assert_eq!(m1.name, m2.name);
+/// assert_eq!(m1.attrs, m2.attrs);
 /// ```
+///
+/// Using the default values
+///
+/// ```
+/// use std::collections::HashMap;
+/// use struct_auto_from::auto_from;
+///
+/// #[derive(Clone)]
+/// struct Model1 {
+///     id: i32,
+///     name: String,
+///     attrs: Vec<String>,
+/// }
+///
+/// #[auto_from(Model1)]
+/// struct Model2 {
+///     #[auto_from_attr(default_value = -1)]
+///     id: i32,
+///     name: String,
+///     attrs: Vec<String>,
+///     #[auto_from_attr(default_value = Default::default())]
+///     metadata: HashMap<String, String>,
+/// }
+///
+///
+/// let m1: Model1 = Model1 {
+///     id: 0,
+///     name: "M".into(),
+///     attrs: vec![],
+/// };
+/// let m2: Model2 = m1.clone().into();
+///
+/// assert_eq!(-1, m2.id);
+/// assert_eq!(m1.name, m2.name);
+/// assert_eq!(m1.attrs, m2.attrs);
+/// assert!(m2.metadata.is_empty());
+/// ```
+///
 #[proc_macro_attribute]
 pub fn auto_from(attrs: TokenStream, input: TokenStream) -> TokenStream {
     let from = parse_macro_input!(attrs as Ident);
