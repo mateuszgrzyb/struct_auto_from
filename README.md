@@ -1,4 +1,4 @@
-# Auto From
+# Struct Auto From
 
 Simple Rust library for auto generating conversion methods
 
