@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod test {
-    use auto_from::auto_from;
     use fake::{Dummy, Fake, Faker};
     use rstest::*;
+    use struct_auto_from::auto_from;
 
     #[derive(PartialEq, Eq, Debug, Clone, Dummy)]
     #[auto_from(Model2)]

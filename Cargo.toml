@@ -1,5 +1,5 @@
 [package]
-name = "auto_from"
+name = "struct_auto_from"
 version = "0.1.0"
 authors = ["Mateusz Grzyb <grzybmateusz@proton.me>"]
 edition = "2021"

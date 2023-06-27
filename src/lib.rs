@@ -9,8 +9,8 @@ use syn::{parse_macro_input, Ident, ItemStruct};
 /// <br>
 ///
 /// # Example
-/// ```
-/// use auto_from::auto_from;
+/// ```ignore
+/// use struct_auto_from::auto_from;
 ///
 /// struct Model1 {
 ///     id: i32,
