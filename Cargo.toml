@@ -2,6 +2,13 @@
 name = "auto_from"
 version = "0.1.0"
 edition = "2021"
+license-file = "LICENSE"
+description = "Simple Rust library for auto generating conversion methods"
+homepage = "https://github.com/mateuszgrzyb/auto_from"
+repository = "https://github.com/mateuszgrzyb/auto_from"
+readme = "README.md"
+keywords = ["macros", "from", "into"]
+categories = ["development-tools::procedural-macro-helpers"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
