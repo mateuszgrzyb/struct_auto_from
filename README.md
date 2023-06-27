@@ -1,6 +1,10 @@
 # Struct Auto From
 
-Simple Rust library for auto generating conversion methods
+Simple Rust library for auto generating conversion methods between structs.
+
+When specifying conversion, all fields in the receiving struct type must either be defined in the sender, or have their default values defined on the receiver.
+
+Default value attribute lets you override data from sender.
 
 ## Instalation
 ```toml
@@ -10,6 +14,7 @@ struct_auto_from = "0.1.0"
 
 ## Usage
 ```rust
+use std::collections::HashMap;
 use struct_auto_from::auto_from;
 
 #[auto_from(UserType)]
@@ -20,20 +25,24 @@ pub struct UserModel {
 
 #[auto_from(UserModel)]
 pub struct UserType {
+    #[auto_from_attr(default_value = 0)]
     id: i32,
     name: String,
+    #[auto_from_attr(default_value = Default::default())]
+    metadata: HashMap<String, String>,
 }
 
 fn main() {
     let user_model = UserModel {
-        id: 0,
+        id: 1234,
         name: "GvR".into(),
     };
 
     let user_type: UserType = user_model.into();
 
     // use user_type without the need for manual conversion
-    // ...
+    // user_type.id == 0
+    // user_type.metadata.is_empty() == true
 }
 ```
 
