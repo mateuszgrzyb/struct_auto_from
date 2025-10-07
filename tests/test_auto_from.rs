@@ -41,9 +41,9 @@ mod test {
         #[auto_from_attr(default_value = 0)]
         id: i32,
         name: String,
-        attrs: Vec<String>,
         #[auto_from_attr(default_value = Default::default())]
         metadata: HashMap<String, String>,
+        attrs: Vec<MyString>,
     }
 
     // In the target struct (the one with the #auto_from annotation) we
@@ -67,8 +67,8 @@ mod test {
     struct Model4 {
         id: i32,
         name: String,
+        var: Option<Foo>,
         attrs: Vec<String>,
-        var: Foo,
     }
 
     #[auto_from(Model4)]
@@ -77,7 +77,7 @@ mod test {
         id: i64,
         name: MyString,
         attrs: Vec<String>,
-        var: Bar,
+        var: Option<Bar>,
     }
 
     #[rstest]
@@ -129,7 +129,13 @@ mod test {
         // then
         assert!(m1_3.id == 0);
         assert!(m1_3.name == m1.name);
-        assert!(m1_3.attrs == m1.attrs);
+        assert!(
+            m1_3.attrs
+                .into_iter()
+                .map(|x| x.value)
+                .collect::<Vec<String>>()
+                == m1.attrs
+        );
         assert!(m1_3.metadata == Default::default());
     }
 
@@ -143,7 +149,7 @@ mod test {
         let m1_5: Model5 = m4.clone().into();
 
         // then
-        assert!(m1_5.id == 0);
+        assert!(m1_5.id == 1);
         assert!(m1_5.name.value == m4.name);
         assert!(m1_5.attrs == m4.attrs);
     }

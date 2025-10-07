@@ -2,7 +2,7 @@ use crate::quote;
 use darling::FromField;
 use proc_macro::TokenStream;
 use proc_macro2::Span;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use syn::{parse_macro_input, Expr, Field, Ident, ItemStruct, Meta, MetaList};
 
 pub fn auto_from_struct(attrs: TokenStream, input: TokenStream) -> TokenStream {
@@ -15,6 +15,8 @@ pub fn auto_from_struct(attrs: TokenStream, input: TokenStream) -> TokenStream {
         fields,
         default_fields,
         default_values,
+        option_fields,
+        vec_fields,
     } = ImplData::from_parsed_input(into);
 
     let tokens = quote! {
@@ -27,6 +29,13 @@ pub fn auto_from_struct(attrs: TokenStream, input: TokenStream) -> TokenStream {
                         #fields: value.#fields.into()
                     ),*
                     ,
+                    #( #vec_fields: value.#vec_fields.into_iter().map(|x| x.into()).collect()
+                    ),*
+                     ,
+                    #(
+                        #option_fields: value.#option_fields.map(|x| x.into())
+                    ),*
+
                     #(
                         #default_fields: #default_values
                     ),*
@@ -43,6 +52,8 @@ struct ImplData {
     into: Ident,
     fields: Vec<Ident>,
     default_fields: Vec<Ident>,
+    vec_fields: Vec<Ident>,
+    option_fields: Vec<Ident>,
     default_values: Vec<Expr>,
 }
 
@@ -54,11 +65,16 @@ impl ImplData {
             Self::extract_defaults_from_input(&mut raw_into)
                 .into_iter()
                 .unzip();
+
+        let vec_fields = Self::extract_type_fields_from_input(&mut raw_into, "Vec");
+        let option_fields = Self::extract_type_fields_from_input(&mut raw_into, "Option");
         let fields = input
             .fields
             .into_iter()
             .filter_map(|f| f.ident)
             .filter(|i| !default_fields.contains(i))
+            .filter(|i| !vec_fields.contains(i))
+            .filter(|i| !option_fields.contains(i))
             .collect();
 
         Self {
@@ -66,6 +82,8 @@ impl ImplData {
             into,
             fields,
             default_fields,
+            option_fields,
+            vec_fields,
             default_values,
         }
     }
@@ -83,6 +101,21 @@ impl ImplData {
         }
 
         defaults
+    }
+
+    fn extract_type_fields_from_input(input: &mut ItemStruct, type_string: &str) -> Vec<Ident> {
+        let mut fields = HashSet::new();
+        for field in input.fields.iter_mut() {
+            if let Some(ident) = &field.ident {
+                if matches!(
+                    &field.ty,
+                    syn::Type::Path(type_path) if type_path.path.segments.first().is_some_and(|segment| segment.ident == type_string)
+                ) {
+                    fields.insert(ident.clone());
+                };
+            }
+        }
+        fields.into_iter().collect::<Vec<Ident>>()
     }
 
     fn remove_attrs(field: &mut Field) {
