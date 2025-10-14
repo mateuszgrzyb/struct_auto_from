@@ -26,15 +26,15 @@ pub fn auto_from_struct(attrs: TokenStream, input: TokenStream) -> TokenStream {
             fn from(value: #from) -> Self {
                 Self {
                     #(
-                        #fields: value.#fields.into()
-                    ),*
-                    ,
-                    #( #vec_fields: value.#vec_fields.into_iter().map(|x| x.into()).collect()
-                    ),*
-                     ,
+                        #fields: value.#fields.into(),
+                    )*
+
+                    #( #vec_fields: value.#vec_fields.into_iter().map(|x| x.into()).collect(),
+                    )*
+
                     #(
-                        #option_fields: value.#option_fields.map(|x| x.into())
-                    ),*
+                        #option_fields: value.#option_fields.map(|x| x.into()),
+                    )*
 
                     #(
                         #default_fields: #default_values

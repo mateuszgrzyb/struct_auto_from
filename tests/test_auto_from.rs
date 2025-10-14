@@ -80,6 +80,39 @@ mod test {
         var: Option<Bar>,
     }
 
+    #[derive(Debug, Default)]
+    pub struct Mixed1 {
+        pub id: i32,
+        pub name: Option<String>,
+        pub key: String,
+        pub regex: Option<String>,
+        pub description: Option<String>,
+    }
+
+    #[derive(Debug, Default)]
+    #[auto_from(Mixed1)]
+    pub struct Mixed2 {
+        pub id: i32,
+        pub name: Option<String>,
+        pub key: String,
+        pub regex: Option<String>,
+        pub description: Option<String>,
+    }
+
+    #[rstest]
+    fn test_auto_from_vec() {
+        // given
+        let m1 = Mixed1::default();
+        let m2 = Mixed2::default();
+
+        // then
+        assert!(m1.id == m2.id);
+        assert!(m1.name == m2.name);
+        assert!(m1.key == m2.key);
+        assert!(m1.regex == m2.regex);
+        assert!(m1.description == m2.description);
+    }
+
     #[rstest]
     fn test_auto_from() {
         // given
