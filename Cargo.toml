@@ -1,6 +1,6 @@
 [package]
 name = "struct_auto_from"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Mateusz Grzyb <grzybmateusz@proton.me>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
@@ -14,7 +14,7 @@ categories = ["development-tools::procedural-macro-helpers"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-darling = "0.20.1"
+darling = "0.21.3"
 proc-macro2 = "1.0.101"
 quote = "1.0.41"
 syn = { version = "2.0.106", features = ["full", "extra-traits"] }
@@ -23,6 +23,6 @@ syn = { version = "2.0.106", features = ["full", "extra-traits"] }
 proc-macro = true
 
 [dev-dependencies]
-fake = { version = "2.6.1", features = ["derive"] }
-rand = "0.8.5"
-rstest = "0.17.0"
+fake = { version = "4.4", features = ["derive"] }
+rand = "0.9"
+rstest = "0.26"
